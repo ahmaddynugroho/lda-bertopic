@@ -35,9 +35,9 @@ def get_topics_bertopic(bertopic):
 
 def e_variant(): # TODO: change dataset and vairant as needed
     # dataset = ['H', 'A', 'S']
-    dataset = ['H', 'A']
+    dataset = ['H']
     # e_variant = ['T', 'C', 'CL', 'CLW', 'CW', 'L', 'LW', 'W']
-    variant = ['T', 'CLW']
+    variant = ['CLW', 'LWN']
     return [f'{e}{v}' for e in dataset for v in variant]
 
 def load_ldas():
