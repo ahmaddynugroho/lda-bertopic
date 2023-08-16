@@ -1,4 +1,7 @@
+import pickle
 from gensim.models.coherencemodel import CoherenceModel
+from bertopic import BERTopic
+import pandas as pd
 
 def get_coherence(topics=None, model=None, texts=None, dictionary=None):
     c = CoherenceModel(model=model, topics=topics, texts=texts, dictionary=dictionary, coherence='c_v')
@@ -29,3 +32,26 @@ def get_topics_bertopic(bertopic):
     result = topics.values()
     result = [[w[0] for w in t] for t in result]
     return result
+
+def e_variant(): # TODO: change dataset and vairant as needed
+    # dataset = ['H', 'A', 'S']
+    dataset = ['H', 'A']
+    # e_variant = ['T', 'C', 'CL', 'CLW', 'CW', 'L', 'LW', 'W']
+    variant = ['T', 'CLW']
+    return [f'{e}{v}' for e in dataset for v in variant]
+
+def load_ldas():
+    r = {} # result
+    for v in e_variant():
+        with open(f'./datasets/small/models_lda/{v}.pickle', 'rb') as f:
+            r[v] = pickle.load(f)
+    return r
+
+def load_bertopics():
+    path_prefix = './datasets/small/models_bertopic/'
+    r = {}
+    for v in e_variant():
+        r[v] = {}
+        r[v]['model'] = BERTopic.load(f'{path_prefix}{v}')
+        r[v]['time'] = pd.read_csv(f'{path_prefix}{v}/time.csv')['time'][0]
+    return r
