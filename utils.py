@@ -1,3 +1,10 @@
+from gensim.models.coherencemodel import CoherenceModel
+
+def get_coherence(topics=None, model=None, texts=None, dictionary=None):
+    c = CoherenceModel(model=model, topics=topics, texts=texts, dictionary=dictionary, coherence='c_v')
+    cs = c.get_coherence()
+    return cs
+
 def get_diversity(topics):
     # https://github.com/MIND-Lab/OCTIS/blob/02fff36346b72818990b9d4d636a7bfb13aa048b/octis/evaluation_metrics/diversity_metrics.py#L12
     topk = 10
