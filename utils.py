@@ -15,3 +15,10 @@ def get_topics_lda(lda, dictionary):
         ki = [dictionary[t[0]] for t in terms]
         topics.append(ki)
     return topics
+
+def get_topics_bertopic(bertopic):
+    topics = bertopic.get_topics().copy()
+    topics.pop(-1)
+    result = topics.values()
+    result = [[w[0] for w in t] for t in result]
+    return result
