@@ -26,32 +26,18 @@ def get_topics_lda(lda, dictionary):
         topics.append(ki)
     return topics
 
-def get_topics_bertopic(bertopic):
+def get_topics_bertopic(bertopic, all=False):
     topics = bertopic.get_topics().copy()
-    topics.pop(-1)
+    if not all:
+        topics.pop(-1)
     result = topics.values()
     result = [[w[0] for w in t] for t in result]
+    result = [t for t in result if len(t) > 1]
     return result
 
 def e_variant(): # TODO: change dataset and vairant as needed
     # dataset = ['H', 'A', 'S']
     dataset = ['H']
     # variant = ['T', 'C', 'L', 'W', 'N', 'CL', 'CW', 'CN', 'LW', 'LN', 'WN', 'CLW', 'LWN', 'WNC', 'NCL', 'CLWN']
-    variant = ['CLWN']
+    variant = ['WN']
     return [f'{e}{v}' for e in dataset for v in variant]
-
-def load_ldas():
-    r = {} # result
-    for v in e_variant():
-        with open(f'./datasets/small/models_lda/{v}.pickle', 'rb') as f:
-            r[v] = pickle.load(f)
-    return r
-
-def load_bertopics():
-    path_prefix = './datasets/small/models_bertopic/'
-    r = {}
-    for v in e_variant():
-        r[v] = {}
-        r[v]['model'] = BERTopic.load(f'{path_prefix}{v}')
-        r[v]['time'] = pd.read_csv(f'{path_prefix}{v}/time.csv')['time'][0]
-    return r
