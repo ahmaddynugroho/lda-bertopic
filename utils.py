@@ -28,16 +28,16 @@ def get_topics_lda(lda, dictionary):
 
 def get_topics_bertopic(bertopic, all=False):
     topics = bertopic.get_topics().copy()
-    if not all:
-        topics.pop(-1)
-    result = topics.values()
+    result = [v for k, v in topics.items() if k != -1]
+    if len(result) == 0:
+        result = [v for k, v in topics.items()]
     result = [[w[0] for w in t] for t in result]
     result = [t for t in result if len(t) > 1]
     return result
 
 def e_variant(): # TODO: change dataset and vairant as needed
-    # dataset = ['H', 'A', 'S']
-    dataset = ['H']
+    dataset = ['H', 'A', 'S']
+    # dataset = ['H']
     # variant = ['T', 'C', 'L', 'W', 'N', 'CL', 'CW', 'CN', 'LW', 'LN', 'WN', 'CLW', 'LWN', 'WNC', 'NCL', 'CLWN']
-    variant = ['WN']
+    variant = ['T', 'CL', 'CLW', 'CLWN']
     return [f'{e}{v}' for e in dataset for v in variant]
