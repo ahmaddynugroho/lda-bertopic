@@ -39,5 +39,5 @@ def e_variant(): # TODO: change dataset and vairant as needed
     dataset = ['H', 'A', 'S']
     # dataset = ['H']
     # variant = ['T', 'C', 'L', 'W', 'N', 'CL', 'CW', 'CN', 'LW', 'LN', 'WN', 'CLW', 'LWN', 'WNC', 'NCL', 'CLWN']
-    variant = ['T', 'CL', 'CLW', 'CLWN']
+    variant = ['WN', 'CLWN']
     return [f'{e}{v}' for e in dataset for v in variant]
