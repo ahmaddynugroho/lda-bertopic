@@ -29,10 +29,11 @@ def get_topics_lda(lda, dictionary):
 def get_topics_bertopic(bertopic, all=False):
     topics = bertopic.get_topics().copy()
     result = [v for k, v in topics.items() if k != -1]
-    if len(result) == 0:
+    if len(result) == 0 or all:
         result = [v for k, v in topics.items()]
     result = [[w[0] for w in t] for t in result]
     result = [t for t in result if len(t) > 1]
+    result = [[w if w else 'bert_empty' for w in t] for t in result]
     return result
 
 def e_variant(): # TODO: change dataset and vairant as needed
