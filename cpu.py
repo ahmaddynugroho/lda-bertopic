@@ -73,7 +73,7 @@ vs = "ar,awg,alwg,sr,swg,slwg".split(",")
 # %% bertopic training
 path = "./datasets/dsn"
 ds = {}
-for v in (tv := tqdm(vs)):
+for v in (tv := tqdm(vs, position=0)):
     bv = f"b_{v}"
     tv.set_description(f"bertopic {bv}")
     _path = f"{path}/{bv}.csv"
@@ -87,7 +87,7 @@ for v in (tv := tqdm(vs)):
         "t": [],
         "s": [],
     }
-    for i in range(3):
+    for i in tqdm(range(5), desc='runs', position=1, leave=False):
         m, tt = timed(lambda: train_b(docs, **get_bargs(bv)))
         c, tc = timed(lambda: get_coherence_b(m, docs))
         d, td = timed(lambda: get_diversity(get_topics_bertopic(m, all=True)))
@@ -107,8 +107,8 @@ for v in (tv := tqdm(vs)):
     ds[bv] = r
 
 
-# %% bertopic training
-for v in (tv := tqdm(vs)):
+# %% lda training
+for v in (tv := tqdm(vs, position=0)):
     lv = f"l_{v}"
     tv.set_description(f"lda {v}")
     _path = f"{path}/{lv}.csv"
@@ -125,7 +125,7 @@ for v in (tv := tqdm(vs)):
         "t": [],
         "s": [],
     }
-    for i in range(3):
+    for i in tqdm(range(5), desc='runs', position=1, leave=False):
         m, tt = timed(lambda: LdaMulticore(corpus, num_topics, id2word))
         c, tc = timed(lambda: get_coherence(model=m, texts=docs, dictionary=id2word))
         d, td = timed(lambda: get_diversity(get_topics_lda(m, id2word)))
