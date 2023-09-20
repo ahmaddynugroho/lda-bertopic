@@ -72,6 +72,7 @@ vs = "ar,awg,alwg,sr,swg,slwg".split(",")
 
 # %% bertopic training
 path = "./datasets/dsn"
+ds_runs = {}
 ds = {}
 for v in (tv := tqdm(vs, position=0)):
     bv = f"b_{v}"
@@ -87,7 +88,7 @@ for v in (tv := tqdm(vs, position=0)):
         "t": [],
         "s": [],
     }
-    for i in tqdm(range(5), desc='runs', position=1, leave=False):
+    for i in tqdm(range(5), desc="runs", position=1, leave=False):
         m, tt = timed(lambda: train_b(docs, **get_bargs(bv)))
         c, tc = timed(lambda: get_coherence_b(m, docs))
         d, td = timed(lambda: get_diversity(get_topics_bertopic(m, all=True)))
@@ -102,6 +103,7 @@ for v in (tv := tqdm(vs, position=0)):
         r["td"].append(td)
         if all(s >= x for x in r["s"]):
             bt = json.dumps(get_topics_bertopic(m, all=True))
+    ds_runs[bv] = {k: json.dumps(v) for (k, v) in r.items()}
     r = {k: mean(v) for (k, v) in r.items()}
     r["tw"] = bt
     ds[bv] = r
@@ -125,7 +127,7 @@ for v in (tv := tqdm(vs, position=0)):
         "t": [],
         "s": [],
     }
-    for i in tqdm(range(5), desc='runs', position=1, leave=False):
+    for i in tqdm(range(5), desc="runs", position=1, leave=False):
         m, tt = timed(lambda: LdaMulticore(corpus, num_topics, id2word))
         c, tc = timed(lambda: get_coherence(model=m, texts=docs, dictionary=id2word))
         d, td = timed(lambda: get_diversity(get_topics_lda(m, id2word)))
@@ -140,6 +142,7 @@ for v in (tv := tqdm(vs, position=0)):
         r["td"].append(td)
         if all(s >= x for x in r["s"]):
             lt = json.dumps(get_topics_lda(m, id2word))
+    ds_runs[lv] = {k: json.dumps(v) for (k, v) in r.items()}
     r = {k: mean(v) for (k, v) in r.items()}
     r["tw"] = lt
     ds[lv] = r
@@ -148,3 +151,5 @@ for v in (tv := tqdm(vs, position=0)):
 # %% save ds
 ds_df = pd.DataFrame.from_dict(ds, orient="index")
 ds_df.to_csv("./results/haruna.csv")
+ds_runs_df = pd.DataFrame.from_dict(ds_runs, orient="index")
+ds_runs_df.to_csv("./results/haruna_runs.csv")
