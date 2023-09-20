@@ -102,7 +102,7 @@ for v in (tv := tqdm(vs)):
         r["td"].append(td)
         if all(s >= x for x in r["s"]):
             bt = json.dumps(get_topics_bertopic(m, all=True))
-    r = {k: mean(v) for (k, v) in r.items() if not k is "bt"}
+    r = {k: mean(v) for (k, v) in r.items()}
     r["tw"] = bt
     ds[bv] = r
 
