@@ -71,7 +71,7 @@ def timed(f):
 vs = "ar,awg,alwg,sr,swg,slwg".split(",")
 
 # %% bertopic training
-path = "./datasets/dsn/"
+path = "./datasets/dsn"
 ds = {}
 for v in (tv := tqdm(vs)):
     bv = f"b_{v}"
