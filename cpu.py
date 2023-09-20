@@ -67,6 +67,16 @@ def timed(f):
     return result, time() - start
 
 
+# %% get top 5 most used topics in bertopic
+def get_top_5_b(model):
+    r = []
+    topics = model.get_topic_freq().head(5)["Topic"]
+    for t in topics:
+        tw = model.get_topic(t)
+        r.append([w for w, _ in tw])
+    return r
+
+
 # %% variants
 vs = "ar,awg,alwg,sr,swg,slwg".split(",")
 
@@ -87,6 +97,7 @@ for v in (tv := tqdm(vs, position=0)):
         "td": [],
         "t": [],
         "s": [],
+        "tw": []
     }
     for i in tqdm(range(5), desc="runs", position=1, leave=False):
         m, tt = timed(lambda: train_b(docs, **get_bargs(bv)))
@@ -94,6 +105,7 @@ for v in (tv := tqdm(vs, position=0)):
         d, td = timed(lambda: get_diversity(get_topics_bertopic(m, all=True)))
         t = tt + tc + td
         s = c * d
+        tw = get_top_5_b(m)
         r["c"].append(c)
         r["d"].append(d)
         r["t"].append(t)
@@ -101,11 +113,12 @@ for v in (tv := tqdm(vs, position=0)):
         r["tt"].append(tt)
         r["tc"].append(tc)
         r["td"].append(td)
+        r["tw"].append(tw)
         if all(s >= x for x in r["s"]):
-            bt = json.dumps(get_topics_bertopic(m, all=True))
+            twt = json.dumps(get_top_5_b(m))
     ds_runs[bv] = {k: json.dumps(v) for (k, v) in r.items()}
-    r = {k: mean(v) for (k, v) in r.items()}
-    r["tw"] = bt
+    r = {k: mean(v) for (k, v) in r.items() if k != 'tw'}
+    r["twt"] = twt
     ds[bv] = r
 
 
