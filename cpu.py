@@ -77,6 +77,12 @@ def get_top_5_b(model):
     return r
 
 
+# %% get top 5 most used topics in lda
+def get_top_5_l(model, corpus, docs, id2word):
+    sorted_topics = m.top_topics(corpus, docs, id2word, coherence="c_v", topn=10)
+    return [[w for wp, w in t] for t, p in sorted_topics[:5]]
+
+
 # %% variants
 vs = "ar,awg,alwg,sr,swg,slwg".split(",")
 
@@ -89,16 +95,7 @@ for v in (tv := tqdm(vs, position=0)):
     tv.set_description(f"bertopic {bv}")
     _path = f"{path}/{bv}.csv"
     docs = get_docs(_path)
-    r = {
-        "c": [],
-        "d": [],
-        "tt": [],
-        "tc": [],
-        "td": [],
-        "t": [],
-        "s": [],
-        "tw": []
-    }
+    r = {"c": [], "d": [], "tt": [], "tc": [], "td": [], "t": [], "s": [], "tw": []}
     for i in tqdm(range(5), desc="runs", position=1, leave=False):
         m, tt = timed(lambda: train_b(docs, **get_bargs(bv)))
         c, tc = timed(lambda: get_coherence_b(m, docs))
@@ -117,7 +114,7 @@ for v in (tv := tqdm(vs, position=0)):
         if all(s >= x for x in r["s"]):
             twt = json.dumps(get_top_5_b(m))
     ds_runs[bv] = {k: json.dumps(v) for (k, v) in r.items()}
-    r = {k: mean(v) for (k, v) in r.items() if k != 'tw'}
+    r = {k: mean(v) for (k, v) in r.items() if k != "tw"}
     r["twt"] = twt
     ds[bv] = r
 
@@ -130,7 +127,7 @@ for v in (tv := tqdm(vs, position=0)):
     docs = get_docs(_path, ast_parse=True)
     id2word = corpora.Dictionary(docs)
     corpus = [id2word.doc2bow(d) for d in docs]
-    num_topics = len(json.loads(ds[f"b_{v}"]["tw"]))
+    num_topics = len(json.loads(ds[f"b_{v}"]["twt"]))
     r = {
         "c": [],
         "d": [],
@@ -139,6 +136,7 @@ for v in (tv := tqdm(vs, position=0)):
         "td": [],
         "t": [],
         "s": [],
+        "tw": [],
     }
     for i in tqdm(range(5), desc="runs", position=1, leave=False):
         m, tt = timed(lambda: LdaMulticore(corpus, num_topics, id2word))
@@ -146,6 +144,7 @@ for v in (tv := tqdm(vs, position=0)):
         d, td = timed(lambda: get_diversity(get_topics_lda(m, id2word)))
         t = tt + tc + td
         s = c * d
+        tw = get_top_5_l(m, corpus, docs, id2word)
         r["c"].append(c)
         r["d"].append(d)
         r["t"].append(t)
@@ -153,11 +152,12 @@ for v in (tv := tqdm(vs, position=0)):
         r["tt"].append(tt)
         r["tc"].append(tc)
         r["td"].append(td)
+        r["tw"].append(tw)
         if all(s >= x for x in r["s"]):
-            lt = json.dumps(get_topics_lda(m, id2word))
+            twt = json.dumps(get_top_5_l(m, corpus, docs, id2word))
     ds_runs[lv] = {k: json.dumps(v) for (k, v) in r.items()}
-    r = {k: mean(v) for (k, v) in r.items()}
-    r["tw"] = lt
+    r = {k: mean(v) for (k, v) in r.items() if k != "tw"}
+    r["twt"] = twt
     ds[lv] = r
 
 
