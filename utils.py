@@ -26,15 +26,14 @@ def get_topics_lda(lda, dictionary):
         topics.append(ki)
     return topics
 
-def get_topics_bertopic(bertopic, all=False):
-    topics = bertopic.get_topics().copy()
-    result = [v for k, v in topics.items() if k != -1]
-    if len(result) == 0 or all:
-        result = [v for k, v in topics.items()]
-    result = [[w[0] for w in t] for t in result]
-    result = [t for t in result if len(t) > 1]
-    result = [[w if w else 'bert_empty' for w in t] for t in result]
-    return result
+def get_topics_bertopic(m, topics, dictionary):
+    topic_words = []
+    for topic in range(len(set(topics)) - m._outliers):
+        words = list(zip(*m.get_topic(topic)))[0]
+        words = [word for word in words if word in dictionary.token2id]
+        topic_words.append(words)
+    topic_words = [words for words in topic_words if len(words) > 0]
+    return topic_words
 
 def e_variant(): # TODO: change dataset and vairant as needed
     dataset = ['H', 'A', 'S']

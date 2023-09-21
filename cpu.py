@@ -53,15 +53,10 @@ def get_coherence_b(m, topics, docs):
     analyzer = vectorizer.build_analyzer()
     tokens = [analyzer(doc) for doc in docs]
     dictionary = corpora.Dictionary(tokens)
-    topic_words = []
-    for topic in range(len(set(topics)) - m._outliers):
-        words = list(zip(*m.get_topic(topic)))[0]
-        words = [word for word in words if word in dictionary.token2id]
-        topic_words.append(words)
-    topic_words = [words for words in topic_words if len(words) > 0]
+    topic_words = get_topics_bertopic(m, topics, dictionary)
     k = len(topic_words)
     c = get_coherence(topics=topic_words, texts=tokens, dictionary=dictionary)
-    return (c, k)
+    return (c, k, tw)
 
 
 # %% used to get training time and basically any lambda fn
@@ -122,9 +117,9 @@ for v in (tv := tqdm(vs, position=0)):
     for i in tqdm(range(5), desc="runs", position=1, leave=False):
         mt, tt = timed(lambda: train_b(docs, **get_bargs(bv)))
         m, topics = mt
-        ck, tc = timed(lambda: get_coherence_b(m, topics, docs))
-        c, k = ck
-        d, td = timed(lambda: get_diversity(get_topics_bertopic(m, all=True)))
+        cktw, tc = timed(lambda: get_coherence_b(m, topics, docs))
+        c, k, tw = cktw
+        d, td = timed(lambda: get_diversity(tw))
         t = tt + tc + td
         s = c * d
         tw = get_top_5_b(m)
