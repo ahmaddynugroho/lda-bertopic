@@ -48,7 +48,7 @@ def get_bargs(v):
 
 
 # %% get bertopic coherence
-def get_coherence_b(model, topics, docs):
+def get_coherence_b(m, topics, docs):
     vectorizer = m.vectorizer_model
     analyzer = vectorizer.build_analyzer()
     tokens = [analyzer(doc) for doc in docs]
