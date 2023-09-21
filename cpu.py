@@ -111,7 +111,7 @@ for v in (tv := tqdm(vs, position=0)):
         "td": [],
         "t": [],
         "s": [],
-        "tw": [],
+        "t5": [],
         "k": [],
     }
     for i in tqdm(range(5), desc="runs", position=1, leave=False):
@@ -122,7 +122,7 @@ for v in (tv := tqdm(vs, position=0)):
         d, td = timed(lambda: get_diversity(tw))
         t = tt + tc + td
         s = c * d
-        tw = get_top_5_b(m)
+        t5 = get_top_5_b(m)
         r["c"].append(c)
         r["d"].append(d)
         r["t"].append(t)
@@ -131,13 +131,13 @@ for v in (tv := tqdm(vs, position=0)):
         r["tt"].append(tt)
         r["tc"].append(tc)
         r["td"].append(td)
-        r["tw"].append(tw)
-        if all(s >= x for x in r["s"]):
+        r["t5"].append(t5)
+        if all(s >= x for x in r["s"][:-1]):
             kt = k
-            twt = json.dumps(get_top_5_b(m))
+            t5t = json.dumps(t5)
     ds_runs[bv] = {k: json.dumps(v) for (k, v) in r.items()}
-    r = {k: mean(v) for (k, v) in r.items() if k not in ["tw", "k"]}
-    r["twt"] = twt
+    r = {k: mean(v) for (k, v) in r.items() if k not in ["t5", "k"]}
+    r["t5t"] = t5t
     r["kt"] = kt
     ds[bv] = r
 
@@ -158,7 +158,7 @@ for v in (tv := tqdm(vs, position=0)):
         "td": [],
         "t": [],
         "s": [],
-        "tw": [],
+        "t5": [],
         "k": [],
     }
     for i in tqdm(range(5), desc="runs", position=1, leave=False):
@@ -168,7 +168,7 @@ for v in (tv := tqdm(vs, position=0)):
         d, td = timed(lambda: get_diversity(get_topics_lda(m, id2word)))
         t = tt + tc + td
         s = c * d
-        tw = get_top_5_l(m, corpus)
+        t5 = get_top_5_l(m, corpus)
         r["c"].append(c)
         r["d"].append(d)
         r["t"].append(t)
@@ -177,13 +177,13 @@ for v in (tv := tqdm(vs, position=0)):
         r["tt"].append(tt)
         r["tc"].append(tc)
         r["td"].append(td)
-        r["tw"].append(tw)
-        if all(s >= x for x in r["s"]):
+        r["t5"].append(t5)
+        if all(s >= x for x in r["s"][:-1]):
             kt = num_topics
-            twt = json.dumps(tw)
+            t5t = json.dumps(t5)
     ds_runs[lv] = {k: json.dumps(v) for (k, v) in r.items()}
-    r = {k: mean(v) for (k, v) in r.items() if k not in ["tw", "k"]}
-    r["twt"] = twt
+    r = {k: mean(v) for (k, v) in r.items() if k not in ["t5", "k"]}
+    r["t5t"] = t5t
     r["kt"] = kt
     ds[lv] = r
 
