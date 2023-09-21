@@ -6,9 +6,7 @@ from time import time
 
 import gensim.corpora as corpora
 import pandas as pd
-import xarray as xr
 from bertopic import BERTopic
-from gensim.models.coherencemodel import CoherenceModel
 from gensim.models.ldamulticore import LdaMulticore
 from Sastrawi.StopWordRemover.StopWordRemoverFactory import StopWordRemoverFactory
 from sklearn.decomposition import TruncatedSVD
