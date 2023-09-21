@@ -26,7 +26,7 @@ def get_docs(pathf, ast_parse=False):
     docs = pd.read_csv(pathf)
     docs.columns = ["doc"]
     docs = docs["doc"].to_list()
-    docs = docs[:100]
+    # docs = docs[:100]
     if ast_parse:
         docs = [ast.literal_eval(d) for d in docs]
     return docs
@@ -36,8 +36,8 @@ def get_docs(pathf, ast_parse=False):
 def train_b(docs, **bargs):
     pipe = make_pipeline(TfidfVectorizer(), TruncatedSVD(100))
     model = BERTopic(embedding_model=pipe, nr_topics="auto", **bargs)
-    model.fit_transform(docs)
-    return model
+    topics, prob = model.fit_transform(docs)
+    return (model, topics)
 
 
 # %% get bertopic training args
@@ -50,13 +50,18 @@ def get_bargs(v):
 
 
 # %% get bertopic coherence
-def get_coherence_b(model, docs):
-    vectorizer = model.vectorizer_model
+def get_coherence_b(model, topics, docs):
+    vectorizer = m.vectorizer_model
     analyzer = vectorizer.build_analyzer()
     tokens = [analyzer(doc) for doc in docs]
     dictionary = corpora.Dictionary(tokens)
-    topics = get_topics_bertopic(model, all=True)
-    c = get_coherence(topics=topics, texts=tokens, dictionary=dictionary)
+    topic_words = []
+    for topic in range(len(set(topics)) - m._outliers):
+        words = list(zip(*m.get_topic(topic)))[0]
+        words = [word for word in words if word in dictionary.token2id]
+        topic_words.append(words)
+    topic_words = [words for words in topic_words if len(words) > 0]
+    c = get_coherence(topics=topic_words, texts=tokens, dictionary=dictionary)
     return c
 
 
@@ -97,8 +102,9 @@ for v in (tv := tqdm(vs, position=0)):
     docs = get_docs(_path)
     r = {"c": [], "d": [], "tt": [], "tc": [], "td": [], "t": [], "s": [], "tw": []}
     for i in tqdm(range(5), desc="runs", position=1, leave=False):
-        m, tt = timed(lambda: train_b(docs, **get_bargs(bv)))
-        c, tc = timed(lambda: get_coherence_b(m, docs))
+        mt, tt = timed(lambda: train_b(docs, **get_bargs(bv)))
+        m, topics = mt
+        c, tc = timed(lambda: get_coherence_b(m, topics, docs))
         d, td = timed(lambda: get_diversity(get_topics_bertopic(m, all=True)))
         t = tt + tc + td
         s = c * d
