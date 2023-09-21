@@ -82,9 +82,18 @@ def get_top_5_b(model):
 
 
 # %% get top 5 most used topics in lda
-def get_top_5_l(model, corpus, docs, id2word):
-    sorted_topics = m.top_topics(corpus, docs, id2word, coherence="c_v", topn=10)
-    return [[w for wp, w in t] for t, p in sorted_topics[:5]]
+def get_top_5_l(m, corpus):
+    td = {"Count": {}}
+    for bow in corpus:
+        _tds = sorted(m[bow], key=lambda x: x[1], reverse=True)
+        ti = _tds[0][0]
+        td["Count"][ti] = td["Count"][ti] + 1 if ti in td["Count"] else 1
+    td = pd.DataFrame.from_dict(td).sort_values(by="Count", ascending=False).head(5)
+    _tw = []
+    for ti in td.index:
+        ti
+        _tw.append([w for w, p in m.show_topic(ti)])
+    return _tw
 
 
 # %% variants
@@ -164,7 +173,7 @@ for v in (tv := tqdm(vs, position=0)):
         d, td = timed(lambda: get_diversity(get_topics_lda(m, id2word)))
         t = tt + tc + td
         s = c * d
-        tw = get_top_5_l(m, corpus, docs, id2word)
+        tw = get_top_5_l(m, corpus)
         r["c"].append(c)
         r["d"].append(d)
         r["t"].append(t)
@@ -176,7 +185,7 @@ for v in (tv := tqdm(vs, position=0)):
         r["tw"].append(tw)
         if all(s >= x for x in r["s"]):
             kt = num_topics
-            twt = json.dumps(get_top_5_l(m, corpus, docs, id2word))
+            twt = json.dumps(tw)
     ds_runs[lv] = {k: json.dumps(v) for (k, v) in r.items()}
     r = {k: mean(v) for (k, v) in r.items() if k not in ["tw", "k"]}
     r["twt"] = twt
