@@ -24,7 +24,7 @@ def get_docs(pathf, ast_parse=False):
     docs = pd.read_csv(pathf)
     docs.columns = ["doc"]
     docs = docs["doc"].to_list()
-    # docs = docs[:100]
+    docs = docs[:100]
     if ast_parse:
         docs = [ast.literal_eval(d) for d in docs]
     return docs
@@ -59,8 +59,9 @@ def get_coherence_b(model, topics, docs):
         words = [word for word in words if word in dictionary.token2id]
         topic_words.append(words)
     topic_words = [words for words in topic_words if len(words) > 0]
+    k = len(topic_words)
     c = get_coherence(topics=topic_words, texts=tokens, dictionary=dictionary)
-    return c
+    return (c, k)
 
 
 # %% used to get training time and basically any lambda fn
@@ -98,11 +99,22 @@ for v in (tv := tqdm(vs, position=0)):
     tv.set_description(f"bertopic {bv}")
     _path = f"{path}/{bv}.csv"
     docs = get_docs(_path)
-    r = {"c": [], "d": [], "tt": [], "tc": [], "td": [], "t": [], "s": [], "tw": []}
+    r = {
+        "c": [],
+        "d": [],
+        "tt": [],
+        "tc": [],
+        "td": [],
+        "t": [],
+        "s": [],
+        "tw": [],
+        "k": [],
+    }
     for i in tqdm(range(5), desc="runs", position=1, leave=False):
         mt, tt = timed(lambda: train_b(docs, **get_bargs(bv)))
         m, topics = mt
-        c, tc = timed(lambda: get_coherence_b(m, topics, docs))
+        ck, tc = timed(lambda: get_coherence_b(m, topics, docs))
+        c, k = ck
         d, td = timed(lambda: get_diversity(get_topics_bertopic(m, all=True)))
         t = tt + tc + td
         s = c * d
@@ -111,15 +123,18 @@ for v in (tv := tqdm(vs, position=0)):
         r["d"].append(d)
         r["t"].append(t)
         r["s"].append(s)
+        r["k"].append(k)
         r["tt"].append(tt)
         r["tc"].append(tc)
         r["td"].append(td)
         r["tw"].append(tw)
         if all(s >= x for x in r["s"]):
+            kt = k
             twt = json.dumps(get_top_5_b(m))
     ds_runs[bv] = {k: json.dumps(v) for (k, v) in r.items()}
-    r = {k: mean(v) for (k, v) in r.items() if k != "tw"}
+    r = {k: mean(v) for (k, v) in r.items() if k not in ["tw", "k"]}
     r["twt"] = twt
+    r["kt"] = kt
     ds[bv] = r
 
 
@@ -131,7 +146,6 @@ for v in (tv := tqdm(vs, position=0)):
     docs = get_docs(_path, ast_parse=True)
     id2word = corpora.Dictionary(docs)
     corpus = [id2word.doc2bow(d) for d in docs]
-    num_topics = len(json.loads(ds[f"b_{v}"]["twt"]))
     r = {
         "c": [],
         "d": [],
@@ -141,8 +155,10 @@ for v in (tv := tqdm(vs, position=0)):
         "t": [],
         "s": [],
         "tw": [],
+        "k": [],
     }
     for i in tqdm(range(5), desc="runs", position=1, leave=False):
+        num_topics = json.loads(ds_runs[f"b_{v}"]["k"])[i]
         m, tt = timed(lambda: LdaMulticore(corpus, num_topics, id2word))
         c, tc = timed(lambda: get_coherence(model=m, texts=docs, dictionary=id2word))
         d, td = timed(lambda: get_diversity(get_topics_lda(m, id2word)))
@@ -153,15 +169,18 @@ for v in (tv := tqdm(vs, position=0)):
         r["d"].append(d)
         r["t"].append(t)
         r["s"].append(s)
+        r["k"].append(num_topics)
         r["tt"].append(tt)
         r["tc"].append(tc)
         r["td"].append(td)
         r["tw"].append(tw)
         if all(s >= x for x in r["s"]):
+            kt = num_topics
             twt = json.dumps(get_top_5_l(m, corpus, docs, id2word))
     ds_runs[lv] = {k: json.dumps(v) for (k, v) in r.items()}
-    r = {k: mean(v) for (k, v) in r.items() if k != "tw"}
+    r = {k: mean(v) for (k, v) in r.items() if k not in ["tw", "k"]}
     r["twt"] = twt
+    r["kt"] = kt
     ds[lv] = r
 
 
