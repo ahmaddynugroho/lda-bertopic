@@ -56,7 +56,7 @@ def get_coherence_b(m, topics, docs):
     topic_words = get_topics_bertopic(m, topics, dictionary)
     k = len(topic_words)
     c = get_coherence(topics=topic_words, texts=tokens, dictionary=dictionary)
-    return (c, k, tw)
+    return (c, k, topic_words)
 
 
 # %% used to get training time and basically any lambda fn
