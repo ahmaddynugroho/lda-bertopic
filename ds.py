@@ -10,19 +10,19 @@ nlp = stanza.Pipeline("id", processor="tokenize,pos,lemma", use_gpu=False)
 
 df = pd.read_csv("./datasets/articles.csv")
 docs = df["article"]
+docs = docs[:10]
+docs = [stanza.Document([], text=doc) for doc in docs]
+docs = nlp(docs)
 
-# docs = docs[:10]
-# docs = docs[109:110]
+path = "./datasets/dsn_batch_nlp"
 
 
 # bertopic
 def process_sentences(bertopic=False, lda=False):
-    path = "./datasets/dsn"
     if bertopic:
         b_sr = {"sentences": []}
         b_slwg = {"sentences": []}
-        for doc in tqdm(docs):
-            doc_nlp = nlp(doc)
+        for doc_nlp in tqdm(docs):
             for sent in doc_nlp.sentences:
                 b_sr["sentences"].append(sent.text)
                 _words = []
@@ -50,8 +50,7 @@ def process_sentences(bertopic=False, lda=False):
         l_sr = {"sentences": []}
         l_slwg = {"sentences": []}
         l_swg = {"sentences": []}
-        for doc in tqdm(docs):
-            doc_nlp = nlp(doc)
+        for doc_nlp in tqdm(docs):
             for sent in doc_nlp.sentences:
                 _words_r = []
                 _words_l = []
@@ -99,9 +98,8 @@ def process_sentences(bertopic=False, lda=False):
 def process_article():
     b_ar = {"article": []}
     b_alwg = {"article": []}
-    for doc in tqdm(docs):
-        doc_nlp = nlp(doc)
-        b_ar["article"].append(doc)
+    for doc_nlp in tqdm(docs):
+        b_ar["article"].append(doc_nlp.text)
         _words = []
         for sent in doc_nlp.sentences:
             for word in sent.words:
@@ -119,7 +117,6 @@ def process_article():
     b_awg = pd.DataFrame.from_dict(b_ar)
     b_ar = pd.DataFrame.from_dict(b_ar)
 
-    path = "./datasets/dsn"
     b_ar.to_csv(f"{path}/b_ar.csv", index=False)
     b_alwg.to_csv(f"{path}/b_alwg.csv", index=False)
     b_awg.to_csv(f"{path}/b_awg.csv", index=False)
@@ -128,8 +125,7 @@ def process_article():
     l_ar = {"article": []}
     l_alwg = {"article": []}
     l_awg = {"article": []}
-    for doc in tqdm(docs):
-        doc_nlp = nlp(doc)
+    for doc_nlp in tqdm(docs):
         _words_r = []
         _words_l = []
         _words = []
@@ -175,5 +171,5 @@ def process_article():
     l_awg.to_csv(f"{path}/l_awg.csv", index=False)
 
 
-process_sentences(lda=True)
+process_sentences(bertopic=True, lda=True)
 process_article()
