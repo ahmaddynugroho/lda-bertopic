@@ -34,10 +34,3 @@ def get_topics_bertopic(m, topics, dictionary):
         topic_words.append(words)
     topic_words = [words for words in topic_words if len(words) > 0]
     return topic_words
-
-def e_variant(): # TODO: change dataset and vairant as needed
-    dataset = ['H', 'A', 'S']
-    # dataset = ['H']
-    # variant = ['T', 'C', 'L', 'W', 'N', 'CL', 'CW', 'CN', 'LW', 'LN', 'WN', 'CLW', 'LWN', 'WNC', 'NCL', 'CLWN']
-    variant = ['WN', 'CLWN']
-    return [f'{e}{v}' for e in dataset for v in variant]
