@@ -16,8 +16,6 @@ from tqdm.auto import tqdm
 
 from utils import get_coherence, get_diversity, get_topics_bertopic, get_topics_lda
 
-stop_words = StopWordRemoverFactory().get_stop_words()
-
 
 # %% get docs as list
 def get_docs(pathf, ast_parse=False):
@@ -42,6 +40,7 @@ def train_b(docs, **bargs):
 def get_bargs(v):
     bargs = {}
     if "wg" in v:
+        stop_words = StopWordRemoverFactory().get_stop_words()
         vectorizer_model = CountVectorizer(ngram_range=(1, 3), stop_words=stop_words)
         bargs["vectorizer_model"] = vectorizer_model
     return bargs
