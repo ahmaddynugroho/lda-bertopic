@@ -69,9 +69,9 @@ def timed(f):
 
 
 # %% get top 5 most used topics in bertopic
-def get_top_5_b(model):
+def get_top_7_b(model):
     r = []
-    topics = model.get_topic_freq().head(5)["Topic"]
+    topics = model.get_topic_freq().head(7)["Topic"]
     for t in topics:
         tw = model.get_topic(t)
         r.append([w for w, _ in tw])
@@ -79,13 +79,13 @@ def get_top_5_b(model):
 
 
 # %% get top 5 most used topics in lda
-def get_top_5_l(m, corpus):
+def get_top_7_l(m, corpus):
     td = {"Count": {}}
     for bow in corpus:
         _tds = sorted(m[bow], key=lambda x: x[1], reverse=True)
         ti = _tds[0][0]
         td["Count"][ti] = td["Count"][ti] + 1 if ti in td["Count"] else 1
-    td = pd.DataFrame.from_dict(td).sort_values(by="Count", ascending=False).head(5)
+    td = pd.DataFrame.from_dict(td).sort_values(by="Count", ascending=False).head(7)
     _tw = []
     for ti in td.index:
         ti
@@ -124,7 +124,7 @@ for v in (tv := tqdm(vs, position=0)):
         d, td = timed(lambda: get_diversity(tw))
         t = tt + tc + td
         s = c * d
-        t5 = get_top_5_b(m)
+        t5 = get_top_7_b(m)
         r["c"].append(c)
         r["d"].append(d)
         r["t"].append(t)
@@ -170,7 +170,7 @@ for v in (tv := tqdm(vs, position=0)):
         d, td = timed(lambda: get_diversity(tw))
         t = tt + tc + td
         s = c * d
-        t5 = get_top_5_b(m)
+        t5 = get_top_7_b(m)
         r["c"].append(c)
         r["d"].append(d)
         r["t"].append(t)
@@ -216,7 +216,7 @@ for v in (tv := tqdm(vs, position=0)):
         d, td = timed(lambda: get_diversity(get_topics_lda(m, id2word)))
         t = tt + tc + td
         s = c * d
-        t5 = get_top_5_l(m, corpus)
+        t5 = get_top_7_l(m, corpus)
         r["c"].append(c)
         r["d"].append(d)
         r["t"].append(t)
