@@ -70,51 +70,6 @@ for v in (tv := tqdm(vs, position=0)):
     r["kt"] = kt
     ds[bv] = r
 
-# %% bertopic training GPU
-for v in (tv := tqdm(vs, position=0)):
-    bv = f"b_{v}"
-    bgv = f"bg_{v}"
-    tv.set_description(f"bertopic {bgv}")
-    _path = f"{path}/{bv}.csv"
-    docs = get_docs(_path)
-    r = {
-        "c": [],
-        "d": [],
-        "tt": [],
-        "tc": [],
-        "td": [],
-        "t": [],
-        "s": [],
-        "t5": [],
-        "k": [],
-    }
-    for i in tqdm(range(5), desc="runs", position=1, leave=False):
-        mt, tt = timed(lambda: train_b(docs, use_gpu=True, **get_bargs(bgv)))
-        m, topics = mt
-        cktw, tc = timed(lambda: get_coherence_b(m, topics, docs))
-        c, k, tw = cktw
-        d, td = timed(lambda: get_diversity(tw))
-        t = tt + tc + td
-        s = c * d
-        t5 = get_top_7_b(m)
-        r["c"].append(c)
-        r["d"].append(d)
-        r["t"].append(t)
-        r["s"].append(s)
-        r["k"].append(k)
-        r["tt"].append(tt)
-        r["tc"].append(tc)
-        r["td"].append(td)
-        r["t5"].append(t5)
-        if all(s >= x for x in r["s"][:-1]):
-            kt = k
-            t5t = json.dumps(t5)
-    ds_runs[bgv] = {k: json.dumps(v) for (k, v) in r.items()}
-    r = {k: mean(v) for (k, v) in r.items() if k not in ["t5", "k"]}
-    r["t5t"] = t5t
-    r["kt"] = kt
-    ds[bgv] = r
-
 # %% lda training
 for v in (tv := tqdm(vs, position=0)):
     lv = f"l_{v}"
