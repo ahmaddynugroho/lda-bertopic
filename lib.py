@@ -7,9 +7,8 @@ from bertopic import BERTopic
 from gensim.models.coherencemodel import CoherenceModel
 from Sastrawi.StopWordRemover.StopWordRemoverFactory import (
     StopWordRemoverFactory)
-from sklearn.decomposition import TruncatedSVD
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from sklearn.pipeline import make_pipeline
+from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import CountVectorizer
 
 
 def get_coherence(topics=None, model=None, texts=None, dictionary=None):
@@ -64,12 +63,10 @@ def get_docs(pathf, ast_parse=False):
 
 
 # %% train bertopic
-def train_b(docs, use_gpu=False, **bargs):
-    if use_gpu:
-        model = BERTopic(language="multilingual", nr_topics="auto", **bargs)
-    else:
-        pipe = make_pipeline(TfidfVectorizer(), TruncatedSVD(100))
-        model = BERTopic(embedding_model=pipe, nr_topics="auto", **bargs)
+def train_b(docs, **bargs):
+    sentence_model = SentenceTransformer(
+        "paraphrase-multilingual-MiniLM-L12-v2", device='cpu')
+    model = BERTopic(embedding_model=sentence_model, nr_topics='auto', **bargs)
     topics, prob = model.fit_transform(docs)
     return (model, topics)
 
