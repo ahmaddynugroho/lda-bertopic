@@ -7,9 +7,18 @@ import pandas as pd
 from gensim.models.ldamulticore import LdaMulticore
 from tqdm.auto import tqdm
 
-from lib import (get_docs, train_b, get_coherence_b, get_diversity, timed,
-                 get_bargs, get_top_7_b, get_top_7_l, get_coherence,
-                 get_topics_lda)
+from lib import (
+    get_bargs,
+    get_coherence,
+    get_coherence_b,
+    get_diversity,
+    get_docs,
+    get_top_7_b,
+    get_top_7_l,
+    get_topics_lda,
+    timed,
+    train_b,
+)
 
 # %% variants
 vs = "ar,awg,alwg,sr,swg,slwg".split(",")
