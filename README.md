@@ -5,7 +5,7 @@ Comparing Gensim's LDA and BERTopic for topic modeling for dataset with differen
 ### Reproduce
 
 ```
-mamba env create -f environments.yml
+mamba env create -f environment.yml
 mamba activate ldab
 
 # prepare dataset and result directory
