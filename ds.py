@@ -14,7 +14,7 @@ docs = docs[:10]
 docs = [stanza.Document([], text=doc) for doc in docs]
 docs = nlp(docs)
 
-path = "./datasets/dsn_batch_nlp"
+path = "./datasets/ds"
 
 
 # bertopic

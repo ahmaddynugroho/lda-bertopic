@@ -24,7 +24,7 @@ from lib import (
 vs = "ar,awg,alwg,sr,swg,slwg".split(",")
 
 # %% bertopic training
-path = "./datasets/dsn"
+path = "./datasets/ds"
 ds_runs = {}
 ds = {}
 for v in (tv := tqdm(vs, position=0)):
@@ -118,6 +118,6 @@ for v in (tv := tqdm(vs, position=0)):
 
 # %% save ds
 ds_df = pd.DataFrame.from_dict(ds, orient="index")
-ds_df.to_csv("./results/haruna.csv")
+ds_df.to_csv("./results/rio.csv")
 ds_runs_df = pd.DataFrame.from_dict(ds_runs, orient="index")
-ds_runs_df.to_csv("./results/haruna_runs.csv")
+ds_runs_df.to_csv("./results/rio_runs.csv")
