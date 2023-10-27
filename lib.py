@@ -56,7 +56,7 @@ def get_docs(pathf, ast_parse=False):
     docs = pd.read_csv(pathf)
     docs.columns = ["doc"]
     docs = docs["doc"].to_list()
-    docs = docs[:100]
+    # docs = docs[:100]
     if ast_parse:
         docs = [ast.literal_eval(d) for d in docs]
     return docs

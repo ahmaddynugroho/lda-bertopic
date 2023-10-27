@@ -10,7 +10,7 @@ nlp = stanza.Pipeline("id", processor="tokenize,pos,lemma", use_gpu=False)
 
 df = pd.read_csv("./datasets/articles.csv")
 docs = df["article"]
-docs = docs[:10]
+# docs = docs[:10]
 docs = [stanza.Document([], text=doc) for doc in docs]
 docs = nlp(docs)
 
