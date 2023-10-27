@@ -1,6 +1,6 @@
 name: ldab
 dependencies:
-  - python=3.11
+  - python=3.10
   - ipykernel
   - stanza=1.5
   - gensim=4.3
