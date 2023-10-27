@@ -1,19 +1,10 @@
-name: lba
-channels:
-  - rapidsai
-  - stanfordnlp
-  - conda-forge
-  - nvidia
+name: ldab
 dependencies:
-  - python=3.10
-  - cuml=23.08
-  - cuda-version=11.8
+  - python=3.11
+  - ipykernel
   - stanza=1.5
-  - ipykernel=6.25
-  - pyarrow=11.0
   - gensim=4.3
   - bertopic=0.15
-  - optuna=3.3
   - pip
   - pip:
     - pysastrawi
