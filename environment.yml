@@ -1,10 +1,10 @@
 name: ldab
 dependencies:
   - python=3.10
-  - ipykernel
+  - ipykernel=6.26
   - stanza=1.5
   - gensim=4.3
   - bertopic=0.15
   - pip
   - pip:
-    - pysastrawi
+    - pysastrawi==1.2
