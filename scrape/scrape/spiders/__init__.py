@@ -31,7 +31,7 @@ class Tempo(scrapy.Spider):
         body = [p.replace("\xa0", " ").strip() for p in body]
         body = " ".join(body)
         if headline and body:
-            yield {"headline": headline, "body": body}
+            yield {"article": f"{headline}. {body}"}
 
 
 class Digilib(scrapy.Spider):
