@@ -4,7 +4,7 @@ Comparing Gensim's LDA and BERTopic for topic modeling for dataset with differen
 
 ### Reproduce
 
-```
+```sh
 mamba env create -f environment.yml
 mamba activate ldab
 
@@ -27,6 +27,7 @@ python cpu.py
 ```
 
 ### Tested on
+
 ```yml
 OS: Ubuntu 22.04.2 LTS on Windows 10 x86_64
 Kernel: 5.15.90.1-microsoft-standard-WSL2
